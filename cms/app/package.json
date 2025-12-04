@@ -1,0 +1,23 @@
+{
+  "name": "cms-web-app",
+  "version": "1.0.0",
+  "description": "Sample CMS Web Application for Azure Container Apps",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": ["cms", "azure", "container-apps"],
+  "author": "asdad-emizzy",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

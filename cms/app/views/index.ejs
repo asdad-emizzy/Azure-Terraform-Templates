@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">CMS</div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Welcome to Azure CMS</h1>
+            <p>A modern content management system running on Azure Container Apps</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="features">
+            <h2>Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🚀 Scalable</h3>
+                    <p>Auto-scaling from 1-3 replicas based on demand</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 Secure</h3>
+                    <p>WAF protected with SSL/TLS encryption</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Fast</h3>
+                    <p>Global CDN via Azure Front Door</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Monitored</h3>
+                    <p>Complete logging with Log Analytics</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info">
+            <h2>Application Info</h2>
+            <div class="info-box">
+                <p><strong>Environment:</strong> <%= environment %></p>
+                <p><strong>Version:</strong> <%= version %></p>
+                <p><strong>Deployment:</strong> Azure Container Apps</p>
+                <p><strong>API Documentation:</strong> <code>/api/articles</code></p>
+            </div>
+        </section>
+
+        <section class="cta">
+            <h2>Get Started</h2>
+            <p>Check out the dashboard to see sample articles and content</p>
+            <a href="/dashboard" class="btn">View Dashboard</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Azure CMS. Built with Terraform and Container Apps.</p>
+        </div>
+    </footer>
+</body>
+</html>

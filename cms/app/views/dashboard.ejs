@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">CMS</div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard" class="active">Dashboard</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>Dashboard</h1>
+
+        <section class="stats">
+            <div class="stat-card">
+                <h3>Total Articles</h3>
+                <p class="stat-value"><%= stats.totalArticles %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <p class="stat-value"><%= stats.totalUsers %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Views</h3>
+                <p class="stat-value"><%= stats.totalViews %></p>
+            </div>
+        </section>
+
+        <section class="articles">
+            <h2>Recent Articles</h2>
+            <div class="articles-list">
+                <% articles.forEach(article => { %>
+                    <article class="article-card">
+                        <h3><%= article.title %></h3>
+                        <div class="article-meta">
+                            <span class="author">By <%= article.author %></span>
+                            <span class="date"><%= new Date(article.created_at).toLocaleDateString() %></span>
+                            <span class="views">👁️ <%= article.views %> views</span>
+                        </div>
+                        <p><%= article.content %></p>
+                        <a href="/api/articles/<%= article.id %>" class="btn-small">View Details</a>
+                    </article>
+                <% }); %>
+            </div>
+        </section>
+
+        <section class="api-test">
+            <h2>Quick API Test</h2>
+            <button onclick="testAPI()" class="btn">Fetch Articles via API</button>
+            <pre id="api-response" style="display:none;"></pre>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Azure CMS. Built with Terraform and Container Apps.</p>
+        </div>
+    </footer>
+
+    <script>
+        function testAPI() {
+            fetch('/api/articles')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('api-response').style.display = 'block';
+                    document.getElementById('api-response').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(err => {
+                    document.getElementById('api-response').style.display = 'block';
+                    document.getElementById('api-response').textContent = 'Error: ' + err.message;
+                });
+        }
+    </script>
+</body>
+</html>
