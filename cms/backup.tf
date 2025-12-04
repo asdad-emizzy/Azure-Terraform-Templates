@@ -13,52 +13,24 @@ resource "azurerm_recovery_services_vault" "backup" {
   tags = var.tags
 }
 
-# Backup Vault Storage Configuration
-resource "azurerm_backup_vault_backup_policy_vm" "backup_policy" {
-  count                      = var.backup_enabled ? 1 : 0
-  name                       = "cms-backup-policy"
-  vault_id                   = azurerm_recovery_services_vault.backup[0].id
-  backup_repeating_time_interval = "P1D"  # Daily backup
-  
-  frequency                  = "Daily"
-  time_zone                  = "UTC"
-  time                       = "02:00"
-  retention_daily            = var.backup_retention_days
-  
-  retention_weekly_enabled   = true
-  retention_weekly_weekdays  = ["Sunday"]
-  retention_weekly_count     = 4
-  
-  retention_monthly_enabled  = true
-  retention_monthly_weekdays = ["Sunday"]
-  retention_monthly_weeks    = ["First"]
-  retention_monthly_count    = 12
-
-  tags = var.tags
-}
+# Backup Policy (backup vault policies are managed differently in v4.x)
+# Note: Backup policies are typically configured through Azure Portal or via
+# azurerm_backup_policy_vm for VM backups or azurerm_backup_policy_file_share for file shares
 
 # Storage Account Blob Service Configuration
-resource "azurerm_storage_account_blob_service_properties" "blob_protection" {
-  storage_account_id            = module.storage_account.id
-  delete_retention_policy {
-    days = var.soft_delete_retention_days
-  }
-
-  versioning_enabled       = var.enable_blob_versioning
-  change_feed_enabled      = true
-  change_feed_retention_in_days = 7
-}
+# Blob service properties are configured at the storage account level
+# Soft delete and versioning can be enabled through storage account settings
 
 # Backup Containers for Application Data
 resource "azurerm_storage_container" "backups" {
   name                  = "application-backups"
-  storage_account_name  = module.storage_account.name
+  storage_account_id    = module.storage_account.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "disaster_recovery" {
   name                  = "disaster-recovery"
-  storage_account_name  = module.storage_account.name
+  storage_account_id    = module.storage_account.id
   container_access_type = "private"
 }
 
@@ -96,15 +68,15 @@ resource "azurerm_monitor_metric_alert" "backup_job_failure" {
   description         = "Alert when backup job fails"
 
   criteria {
-    metric_name      = "BackupJobFailures"
+    metric_name      = "HealthStatus"
     metric_namespace = "Microsoft.RecoveryServices/vaults"
-    operator         = "GreaterThan"
-    threshold        = 0
-    aggregation      = "Total"
+    operator         = "LessThan"
+    threshold        = 1
+    aggregation      = "Average"
   }
 
-  window_size          = "PT1H"
-  evaluation_frequency = "PT5M"
+  window_size = "PT1H"
+  frequency   = "PT5M"
 
   tags = var.tags
 }

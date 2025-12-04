@@ -12,22 +12,22 @@ output "resource_group_id" {
 
 output "container_app_fqdn" {
   description = "Fully qualified domain name of the Container App"
-  value       = module.container_app.fqdn
+  value       = "Container App not deployed in this configuration"
 }
 
 output "application_gateway_public_ip" {
   description = "Public IP address of the Application Gateway"
-  value       = azurerm_public_ip.appgw.ip_address
+  value       = "Application Gateway not deployed in this configuration"
 }
 
 output "front_door_endpoint" {
   description = "Azure Front Door endpoint hostname"
-  value       = try(module.frontdoor.endpoint_hostname, "Not configured")
+  value       = "Front Door not deployed in this configuration"
 }
 
 output "dns_zone_nameservers" {
   description = "Azure DNS nameservers for domain delegation"
-  value       = try(module.dns.nameservers, [])
+  value       = []
 }
 
 output "key_vault_uri" {
@@ -40,11 +40,8 @@ output "log_analytics_workspace_id" {
   value       = module.log_analytics.workspace_id
 }
 
-output "log_analytics_workspace_key" {
-  description = "Log Analytics Workspace primary key"
-  value       = module.log_analytics.workspace_key
-  sensitive   = true
-}
+# Note: workspace_key is not recommended to output for security reasons
+# Access keys through Azure Portal or az CLI if needed
 
 output "storage_account_name" {
   description = "Name of the Storage Account"
@@ -58,60 +55,42 @@ output "storage_account_primary_blob_endpoint" {
 
 output "virtual_network_id" {
   description = "ID of the created Virtual Network"
-  value       = module.virtual_network.id
+  value       = "Virtual Network not deployed in this configuration"
 }
 
 output "appgw_subnet_id" {
   description = "ID of the Application Gateway subnet"
-  value       = module.virtual_network.subnets["appgw-subnet"].id
+  value       = "Application Gateway subnet not deployed in this configuration"
 }
 
 output "container_app_environment_id" {
   description = "ID of the Container Apps Environment"
-  value       = module.container_app_environment.id
+  value       = "Container App Environment not deployed in this configuration"
 }
 
 # Access Instructions
 output "access_instructions" {
   description = "Instructions for accessing the deployed application"
-  value = format(<<-EOT
+  value = <<-EOT
     
     ============================================
     Azure CMS Infrastructure Deployment Complete
     ============================================
     
-    Application Access:
-    - Container App FQDN: https://%s
-    - Application Gateway IP: https://%s
-    - Front Door Endpoint: https://%s
-    
-    DNS Configuration:
-    - Domain: %s
-    - Azure Nameservers: %s
-    - Next: Configure nameservers at your domain registrar
-    
-    Management:
-    - Resource Group: %s
-    - Key Vault: %s
-    - Log Analytics: %s (Workspace ID: %s)
-    - Storage Account: %s
-    
-    Monitoring & Logs:
-    - View logs: az monitor log-analytics workspace query
-    - View metrics: az monitor metrics list
-    - Create dashboards: Azure Portal > Dashboards
-    
-    Deployment Details:
-    - Container Image: Check main.tf for current image
-    - SSL Certificate: Stored in Key Vault
-    - Backup: Configured in backup vault
+    Core Resources Deployed:
+    - Resource Group: ${module.resource_group.name}
+    - Key Vault: ${module.key_vault.vault_uri}
+    - Log Analytics: ${module.log_analytics.workspace_id}
+    - Storage Account: ${module.storage_account.name}
+    - Domain: ${var.domain_name}
     
     Next Steps:
-    1. Update DNS records at your domain registrar
-    2. Upload SSL certificate to Key Vault
-    3. Configure Application Gateway with SSL
-    4. Run load tests to validate performance
-    5. Set up monitoring alerts
+    1. Deploy additional components (Container Apps, App Gateway, Front Door)
+    2. Build and push container image to ACR
+    3. Upload SSL certificate to Key Vault
+    4. Configure DNS nameservers at registrar
+    5. Run load tests to validate performance
+    6. Set up monitoring alerts
     
     Support Documentation:
     - Terraform Modules: See /cms/modules/
@@ -120,24 +99,6 @@ output "access_instructions" {
     
     ============================================
   EOT
-    ,
-    module.container_app.fqdn,
-    azurerm_public_ip.appgw.ip_address,
-    try(module.frontdoor.endpoint_hostname, "Not configured"),
-    var.domain_name,
-    join(", ", try(module.dns.nameservers, ["Not configured"])),
-    module.resource_group.name,
-    module.key_vault.vault_uri,
-    module.log_analytics.workspace_id,
-    module.log_analytics.workspace_id,
-    module.storage_account.name
-  )
-}
-
-# Backup Configuration Output
-output "backup_vault_id" {
-  description = "ID of the Backup Vault (if enabled)"
-  value       = try(azurerm_recovery_services_vault.backup[0].id, "Backup not enabled")
 }
 
 # Security Summary
